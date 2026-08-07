@@ -1,5 +1,12 @@
 from pyspark.sql import SparkSession
 
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from utils.logger import logger
+
 # PostgreSQL Connection
 url = "jdbc:postgresql://localhost:5432/retail_db"
 properties = {
@@ -39,18 +46,18 @@ df = spark.read.csv(
     inferSchema=True
 )
 
-print("Original Data")
+logger.info("Original Data Loaded")
 df.show()
 
 # Customer Dimension
 dim_customer = df.select("customer_name").distinct()
 
-print("Customer rows:", dim_customer.count())
+logger.info("Customer Dimension Loaded")
 dim_customer.show()
 
-print("Writing Customer Table...")
+logger.info("Writing Customer Table...")
 
-print("Writing Customer Table...")
+
 
 try:
     dim_customer.write.mode("append").jdbc(
@@ -58,14 +65,13 @@ try:
         table="dim_customer",
         properties=properties
     )
-    print("✅ Customer write successful")
+    logger.info("Customer Dimension Loaded Successfully")
 
-except Exception:
-    import traceback
-    print("❌ JDBC WRITE FAILED")
-    traceback.print_exc()
+except Exception as e:
+    logger.exception(f"Customer Dimension Load Failed: {e}")
+    raise
 
-print("Write Finished")
+logger.info("Customer Table Load Completed")
 
 spark.read.jdbc(
     url=url,
@@ -84,7 +90,7 @@ dim_product.write.mode("append").jdbc(
     properties=properties
 )
 
-print("Product Dimension Loaded")
+logger.info("Product Dimension Loaded")
 
 dim_city = df.select("city").distinct()
 
@@ -94,7 +100,7 @@ dim_city.write.mode("append").jdbc(
     properties=properties
 )
 
-print("City Dimension Loaded")
+logger.info("City Dimension Loaded")
 
 # Read dimension tables from PostgreSQL
 customer_df = spark.read.jdbc(
@@ -130,7 +136,7 @@ fact_sales = (
     )
 )
 
-print("Fact Table Preview")
+logger.info("Fact Table Created")
 fact_sales.show()
 
 fact_sales.write.mode("append").jdbc(
@@ -139,7 +145,7 @@ fact_sales.write.mode("append").jdbc(
     properties=properties
 )
 
-print("✅ Fact Table Loaded")
+logger.info("Fact Table Loaded")
 
 
 spark.stop()
