@@ -59,7 +59,7 @@ df = spark.read.csv(
 
 df.show()
 
-df.write.mode("overwrite").jdbc(
+df.write.mode("append").jdbc(
         url=url,
         table="retail_sales",
         properties=properties
