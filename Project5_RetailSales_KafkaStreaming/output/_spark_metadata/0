@@ -1,2 +1,2 @@
 v1
-{"path":"file:///Users/apple/Desktop/DataEngineering/Project5_RetailSales_KafkaStreaming/output/part-00000-024c897d-57bf-4ee3-a59e-6b403627b05a-c000.snappy.parquet","size":2535,"isDir":false,"modificationTime":1786458475553,"blockReplication":1,"blockSize":33554432,"action":"add"}
+{"path":"file:///Users/apple/Desktop/DataEngineering/Project5_RetailSales_KafkaStreaming/output/part-00000-8a2c58b6-4f83-4198-8a66-3cb2a6af07a6-c000.snappy.parquet","size":2921,"isDir":false,"modificationTime":1786465948924,"blockReplication":1,"blockSize":33554432,"action":"add"}
