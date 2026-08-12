@@ -1,4 +1,63 @@
+# Environment
+.env
+
+# Virtual environment
 venv/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Logs
+logs/
+*.log
+
+# Spark
+checkpoints/
+output/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp# Virtual environment
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+logs/
+*.log
+
+# Spark checkpoints
+checkpoints/
+
+# Spark output
+output/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Python cache
+.pytest_cache/
+
+# Temporary files
+*.tmpvenv/
 __pycache__/
 *.pyc
 checkpoints/
