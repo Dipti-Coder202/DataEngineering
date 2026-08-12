@@ -1,78 +1,76 @@
 # Project 5 — Retail Sales Kafka Streaming Pipeline
 
-A real-time retail sales data engineering pipeline built with **Apache Kafka, PySpark Structured Streaming, and PostgreSQL**.
+A real-time retail sales data engineering pipeline built with **Python, Apache Kafka, PySpark Structured Streaming, PostgreSQL, Docker, and GitHub**.
 
-This project demonstrates how retail sales events can be published to Kafka, processed in real time using Spark Structured Streaming, transformed, and loaded into PostgreSQL.
+This project extends a retail sales batch-processing pipeline into a streaming architecture. Retail sales records are published as events to **Apache Kafka**, processed using **Spark Structured Streaming**, transformed in real time, and loaded into **PostgreSQL**.
 
 ---
 
 ## 🚀 Project Overview
 
-This project extends the retail sales pipeline into a streaming architecture.
+The pipeline processes retail sales events through the following flow:
 
-Instead of processing only a static dataset through batch ETL, retail sales records are published as events to **Apache Kafka** and consumed by **PySpark Structured Streaming**.
-
-The streaming pipeline:
-
-1. Reads retail sales events from Kafka.
-2. Converts Kafka JSON messages into structured Spark DataFrames.
-3. Calculates `total_amount`.
-4. Processes streaming data using micro-batches.
-5. Uses Spark checkpointing for recovery.
-6. Loads processed records into PostgreSQL.
-7. Uses PostgreSQL upsert logic to handle duplicate `order_id` values.
+1. Reads retail sales records from `sales.csv`.
+2. Publishes each sales record as a JSON event to Kafka.
+3. Stores events in the `retail_sales` Kafka topic.
+4. Reads Kafka events using PySpark Structured Streaming.
+5. Parses the JSON messages using a defined schema.
+6. Calculates `total_amount` using price and quantity.
+7. Processes records using Spark micro-batches and `foreachBatch`.
+8. Loads processed records into PostgreSQL.
+9. Uses PostgreSQL upsert logic to handle duplicate `order_id` values.
+10. Uses Spark checkpointing to support streaming recovery.
 
 ---
 
 ## 🏗️ Architecture
 
 ```text
-                 Retail Sales Data
-                        │
-                        ▼
-                  sales.csv
-                        │
-                        ▼
-                Kafka Producer
-                        │
-                        ▼
-                Apache Kafka
-                  retail_sales
-                        │
-                        ▼
-          Spark Structured Streaming
-                        │
-             ┌──────────┴──────────┐
-             │                     │
-             ▼                     ▼
-        JSON Parsing        Transformation
-                                   │
-                                   ▼
-                       total_amount = price
-                                      × quantity
-                                   │
-                         ┌─────────┴─────────┐
-                         │                   │
-                         ▼                   ▼
-                    PostgreSQL           Parquet
-                  streaming_sales         output/
+                    Retail Sales Data
+                           │
+                           ▼
+                      sales.csv
+                           │
+                           ▼
+                   Kafka Producer
+                           │
+                           ▼
+                    Apache Kafka
+                    retail_sales
+                           │
+                           ▼
+             Spark Structured Streaming
+                           │
+                    JSON Parsing
+                           │
+                           ▼
+                   Data Transformation
+                           │
+                           ▼
+             total_amount = price × quantity
+                           │
+                  ┌────────┴────────┐
+                  │                 │
+                  ▼                 ▼
+             PostgreSQL          Parquet
+          streaming_sales       output/
 ```
 
 ---
 
 ## 🛠️ Technologies
 
-| Technology | Purpose |
-|------------|---------|
-| Python | Application development |
-| Apache Kafka | Real-time event streaming |
-| PySpark | Stream processing |
-| Spark Structured Streaming | Real-time data processing |
-| PostgreSQL | Target database |
-| psycopg2 | PostgreSQL connectivity |
-| Docker | Infrastructure |
-| python-dotenv | Environment variable management |
-| Git & GitHub | Version control |
+| Technology                 | Purpose                             |
+| -------------------------- | ----------------------------------- |
+| Python                     | Application development             |
+| Apache Kafka               | Real-time event streaming           |
+| PySpark                    | Distributed data processing         |
+| Spark Structured Streaming | Real-time stream processing         |
+| PostgreSQL                 | Target database                     |
+| psycopg2                   | PostgreSQL connectivity             |
+| Docker                     | Kafka and infrastructure management |
+| python-dotenv              | Environment variable management     |
+| Git & GitHub               | Version control                     |
 
 ---
 
@@ -107,7 +105,7 @@ Project5_RetailSales_KafkaStreaming/
 └── README.md
 ```
 
-Generated files such as checkpoints, logs, Spark output, virtual environments, secrets, and JDBC JAR files are excluded from Git tracking.
+Runtime-generated files such as checkpoints, logs, Spark output, virtual environments, secrets, and JDBC JAR files are excluded from Git tracking.
 
 ---
 
@@ -119,33 +117,33 @@ The source dataset is:
 data/sales.csv
 ```
 
-The sales data contains the following fields:
+The dataset contains the following fields:
 
-| Column | Description |
-|--------|-------------|
-| `order_id` | Order identifier |
-| `customer_name` | Customer name |
-| `product` | Product name |
-| `category` | Product category |
-| `price` | Product price |
-| `quantity` | Quantity purchased |
-| `city` | Customer city |
+| Column          | Description             |
+| --------------- | ----------------------- |
+| `order_id`      | Unique order identifier |
+| `customer_name` | Customer name           |
+| `product`       | Product name            |
+| `category`      | Product category        |
+| `price`         | Product price           |
+| `quantity`      | Quantity purchased      |
+| `city`          | Customer city           |
 
 ---
 
 ## 🔄 Streaming Data Transformation
 
-Kafka messages are received as JSON.
+Kafka messages are published as JSON records.
 
-Spark Structured Streaming parses the JSON data using a defined schema.
+Spark Structured Streaming reads the Kafka messages and converts the JSON data into a structured DataFrame.
 
-The pipeline then calculates:
+The pipeline calculates:
 
 ```text
 total_amount = price × quantity
 ```
 
-For example:
+Example:
 
 ```text
 price = 85000
@@ -154,11 +152,20 @@ quantity = 1
 total_amount = 85000
 ```
 
+Another example:
+
+```text
+price = 500
+quantity = 2
+
+total_amount = 1000
+```
+
 ---
 
 ## 📨 Kafka
 
-The Kafka topic used by the project is:
+The Kafka topic used by this project is:
 
 ```text
 retail_sales
@@ -170,13 +177,25 @@ The Kafka broker is configured as:
 localhost:9092
 ```
 
-The producer publishes retail sales records to the Kafka topic.
+The producer script is:
+
+```text
+scripts/producer.py
+```
+
+The producer reads records from:
+
+```text
+data/sales.csv
+```
+
+and publishes them as Kafka events.
 
 ---
 
 ## ⚡ Spark Structured Streaming
 
-The main PostgreSQL streaming application is:
+The main streaming application that loads data into PostgreSQL is:
 
 ```text
 scripts/streaming_to_postgres.py
@@ -184,15 +203,15 @@ scripts/streaming_to_postgres.py
 
 The application:
 
-- connects to Kafka
-- reads streaming messages
-- converts Kafka values from bytes to strings
-- parses JSON
-- applies the sales schema
-- calculates `total_amount`
-- processes micro-batches using `foreachBatch`
-- writes processed records to PostgreSQL
-- uses Spark checkpointing
+* connects to Kafka
+* reads messages from the `retail_sales` topic
+* converts Kafka message values from bytes to strings
+* parses JSON messages
+* applies the sales schema
+* calculates `total_amount`
+* processes micro-batches using `foreachBatch`
+* writes records to PostgreSQL
+* uses Spark checkpointing
 
 ---
 
@@ -206,18 +225,18 @@ streaming_sales
 
 The table contains:
 
-| Column | Type |
-|--------|------|
-| `order_id` | INTEGER |
+| Column          | Type    |
+| --------------- | ------- |
+| `order_id`      | INTEGER |
 | `customer_name` | VARCHAR |
-| `product` | VARCHAR |
-| `category` | VARCHAR |
-| `price` | INTEGER |
-| `quantity` | INTEGER |
-| `city` | VARCHAR |
-| `total_amount` | INTEGER |
+| `product`       | VARCHAR |
+| `category`      | VARCHAR |
+| `price`         | INTEGER |
+| `quantity`      | INTEGER |
+| `city`          | VARCHAR |
+| `total_amount`  | INTEGER |
 
-The table schema is defined in:
+The table definition is stored in:
 
 ```text
 sql/schema.sql
@@ -225,20 +244,20 @@ sql/schema.sql
 
 ### Upsert Logic
 
-The PostgreSQL streaming pipeline uses:
+The PostgreSQL pipeline uses:
 
 ```sql
 ON CONFLICT (order_id)
 DO UPDATE
 ```
 
-This prevents duplicate `order_id` records from being inserted and updates the existing record instead.
+This allows the pipeline to update an existing record when the same `order_id` is processed again instead of creating a duplicate row.
 
 ---
 
 ## 🔐 Environment Variables
 
-Database credentials are stored in a local `.env` file.
+Database configuration is stored in a local `.env` file.
 
 Create:
 
@@ -256,7 +275,9 @@ DB_USER=your_database_user
 DB_PASSWORD=your_database_password
 ```
 
-The `.env` file is ignored by Git and should **never be committed to GitHub**.
+Do not place real passwords in the README.
+
+The `.env` file should be included in `.gitignore` and must **never be committed to GitHub**.
 
 ---
 
@@ -294,31 +315,63 @@ pip install -r requirements.txt
 
 ---
 
-## 🐳 Start Infrastructure
+## 🐳 Start Kafka Infrastructure
 
-Start the Docker services:
+Start the Kafka and ZooKeeper containers:
 
 ```bash
 docker compose up -d
 ```
 
-Check running containers:
+Check the running containers:
 
 ```bash
 docker ps
+```
+
+The project uses:
+
+```text
+Kafka      → localhost:9092
+ZooKeeper  → localhost:2181
+```
+
+---
+
+## 📨 Verify Kafka Topic
+
+The Kafka topic used by the project is:
+
+```text
+retail_sales
+```
+
+You can verify the topic from the Kafka container:
+
+```bash
+docker exec -it project5_retailsales_kafkastreaming-kafka-1 \
+kafka-topics --bootstrap-server localhost:9092 --list
+```
+
+Expected output should include:
+
+```text
+retail_sales
 ```
 
 ---
 
 ## 🗄️ Create PostgreSQL Table
 
-Connect to PostgreSQL:
+Make sure PostgreSQL is running and the database exists.
+
+Connect using:
 
 ```bash
 psql -U retail_user -d retail_db
 ```
 
-Then run:
+Then create the table:
 
 ```sql
 CREATE TABLE IF NOT EXISTS streaming_sales (
@@ -333,14 +386,19 @@ CREATE TABLE IF NOT EXISTS streaming_sales (
 );
 ```
 
-Alternatively, from the **Mac Terminal** you can execute:
+The SQL schema is also available in:
 
-```bash
-psql -U retail_user -d retail_db \
-    -f sql/schema.sql
+```text
+sql/schema.sql
 ```
 
-> The `psql -f` command must be run from the Terminal, not from inside the `retail_db=>` PostgreSQL prompt.
+From the **Mac Terminal**, you can run:
+
+```bash
+psql -U retail_user -d retail_db -f sql/schema.sql
+```
+
+> Run the `psql -f` command from the project directory in the Mac Terminal. Do not run it from inside the `retail_db=>` PostgreSQL prompt.
 
 ---
 
@@ -352,23 +410,48 @@ From the project directory:
 python scripts/producer.py
 ```
 
-The producer publishes retail sales events to:
+The producer reads:
+
+```text
+data/sales.csv
+```
+
+and publishes the sales records to:
 
 ```text
 retail_sales
+```
+
+Expected output is similar to:
+
+```text
+Sent: 1001
+Sent: 1002
+Sent: 1003
+...
+Sent: 1010
+Finished Sending Data
 ```
 
 ---
 
 ## ⚡ Run Spark Streaming → PostgreSQL
 
-Start the streaming application:
+Start the Spark streaming application:
 
 ```bash
 python scripts/streaming_to_postgres.py
 ```
 
-The application continuously reads Kafka events and loads the processed records into PostgreSQL.
+The application continuously reads Kafka events and processes them using Spark Structured Streaming.
+
+Processed records are written to:
+
+```text
+PostgreSQL → streaming_sales
+```
+
+Keep the streaming application running while Kafka events are being processed.
 
 ---
 
@@ -380,7 +463,7 @@ Connect to PostgreSQL:
 psql -U retail_user -d retail_db
 ```
 
-Check the records:
+Check the processed records:
 
 ```sql
 SELECT *
@@ -412,19 +495,19 @@ Because `order_id` is the primary key, the duplicate query should return no rows
 
 The streaming application uses Spark checkpointing to maintain streaming progress and support recovery.
 
-Checkpoint files are stored locally under:
+Checkpoint files are generated locally under:
 
 ```text
 checkpoints/
 ```
 
-The PostgreSQL streaming pipeline uses:
+The PostgreSQL streaming application uses:
 
 ```text
 checkpoints/postgres/
 ```
 
-Checkpoint files are generated runtime artifacts and are excluded from Git.
+Checkpoint files are runtime artifacts and should not be committed to Git.
 
 ---
 
@@ -436,51 +519,63 @@ The project also contains:
 scripts/streaming_etl.py
 ```
 
-This Spark Structured Streaming pipeline reads data from Kafka, performs the streaming transformation, and writes the processed data to Parquet.
+This application reads Kafka events using Spark Structured Streaming, performs the streaming transformation, and writes processed data to Parquet.
 
-Generated Parquet output is stored locally under:
+Generated Parquet files are stored under:
 
 ```text
 output/
 ```
 
-The generated output is excluded from Git.
+The generated output is excluded from Git tracking.
 
 ---
 
 ## 🧪 Testing
 
-### Test PostgreSQL connection
+### Test PostgreSQL Connection
+
+Run:
 
 ```bash
 python scripts/test_db.py
 ```
 
-### Test logging
+This verifies the PostgreSQL database connection.
+
+### Test Logging
+
+Run:
 
 ```bash
 python scripts/test_logger.py
 ```
 
-### Check generated Spark output
+This verifies the project's logging functionality.
+
+### Check Spark Output
+
+Run:
 
 ```bash
 python scripts/check_output.py
 ```
 
+This checks the generated Spark output.
+
 ---
 
 ## 📈 Example PostgreSQL Result
 
-Example records processed by the pipeline:
+Example processed records:
 
-| order_id | customer | product | quantity | total_amount |
-|----------|----------|---------|----------|--------------|
-| 1001 | Alice | Laptop | 1 | 85000 |
-| 1002 | Bob | Mouse | 2 | 1000 |
-| 1003 | Charlie | Keyboard | 1 | 1200 |
-| 1004 | David | Chair | 2 | 7000 |
-| 1005 | Eva | Table | 1 | 7000 |
+| order_id | customer | product  | quantity | total_amount |
+| -------: | -------- | -------- | -------: | -----------: |
+|     1001 | Alice    | Laptop   |        1 |        85000 |
+|     1002 | Bob      | Mouse    |        2 |         1000 |
+|     1003 | Charlie  | Keyboard |        1 |         1200 |
+|     1004 | David    | Chair    |        2 |         7000 |
+|     1005 | Eva      | Table    |        1 |         7000 |
 
 ---
 
@@ -488,23 +583,24 @@ Example records processed by the pipeline:
 
 This project demonstrates:
 
-- Event-driven data pipelines
-- Apache Kafka
-- Kafka topics
-- Kafka producers and consumers
-- Spark Structured Streaming
-- JSON parsing
-- Schema definition
-- Streaming transformations
-- Micro-batch processing
-- `foreachBatch`
-- PostgreSQL integration
-- PostgreSQL upsert logic
-- Spark checkpointing
-- Environment variable management
-- Logging
-- Docker
-- Git and GitHub
+* Event-driven data pipelines
+* Apache Kafka
+* Kafka topics
+* Kafka producers and consumers
+* JSON event processing
+* PySpark
+* Spark Structured Streaming
+* Schema definition
+* Streaming transformations
+* Micro-batch processing
+* `foreachBatch`
+* PostgreSQL integration
+* PostgreSQL upsert logic
+* Spark checkpointing
+* Environment variable management
+* Logging
+* Docker
+* Git and GitHub
 
 ---
 
@@ -512,17 +608,17 @@ This project demonstrates:
 
 Potential improvements include:
 
-- Add data quality validation
-- Add handling for malformed Kafka messages
-- Add a dead-letter queue
-- Add Kafka consumer groups
-- Add monitoring and metrics
-- Add Apache Airflow orchestration
-- Add Delta Lake
-- Add AWS S3
-- Add Databricks deployment
-- Add automated CI/CD testing
-- Add a real-time dashboard
+* Add data quality validation
+* Handle malformed Kafka messages
+* Add a dead-letter queue
+* Add Kafka consumer groups
+* Add monitoring and metrics
+* Add Apache Airflow orchestration
+* Add Delta Lake
+* Add AWS S3
+* Add Databricks deployment
+* Add automated CI/CD testing
+* Add a real-time dashboard
 
 ---
 
