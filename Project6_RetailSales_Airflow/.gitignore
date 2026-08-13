@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.venv/
+
+# Environment variables
+.env
+
+# Airflow
+airflow.cfg
+airflow.db
+airflow-webserver.pid
+airflow-scheduler.pid
+airflow-worker.pid
+logs/
+standalone_admin_password.txt
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
