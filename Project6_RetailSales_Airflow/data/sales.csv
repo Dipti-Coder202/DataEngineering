@@ -1,0 +1,11 @@
+order_id,customer_name,product,category,price,quantity,city
+1001,Alice,Laptop,Electronics,85000,1,Bangalore
+1002,Bob,Mouse,Electronics,500,2,Hyderabad
+1003,Charlie,Keyboard,Electronics,1200,1,Chennai
+1004,David,Chair,Furniture,3500,2,Mumbai
+1005,Eva,Table,Furniture,7000,1,Pune
+1006,Frank,Laptop,Electronics,85000,1,Bangalore
+1007,Gina,Mouse,Electronics,500,3,Delhi
+1008,Harry,Table,Furniture,7000,2,Hyderabad
+1009,Irene,Sofa,Furniture,25000,1,Mumbai
+1010,Jack,Laptop,Electronics,85000,1,Chennai
