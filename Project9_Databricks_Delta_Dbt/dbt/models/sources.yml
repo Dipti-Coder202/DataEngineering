@@ -1,0 +1,13 @@
+version: 2
+
+sources:
+  - name: lakeflow
+    description: Curated Delta tables produced by the Lakeflow pipeline.
+    catalog: "{{ env_var('DBT_CATALOG', 'workspace') }}"
+    schema: "{{ env_var('DBT_SCHEMA', 'project9_retail_dev') }}"
+    tables:
+      - name: silver_orders_history
+        description: SCD Type 2 order history generated with AUTO CDC.
+      - name: quarantined_orders
+        description: Invalid source records retained for investigation.
+

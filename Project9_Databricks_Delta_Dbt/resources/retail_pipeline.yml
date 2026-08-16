@@ -1,0 +1,15 @@
+resources:
+  pipelines:
+    retail_sales_pipeline:
+      name: "[${bundle.target}] Project 9 Retail Medallion Pipeline"
+      catalog: ${var.catalog}
+      target: ${var.schema}
+      serverless: true
+      continuous: false
+      channel: CURRENT
+      libraries:
+        - file:
+            path: ../src/pipelines/retail_pipeline.py
+      configuration:
+        project9.source_path: ${var.source_path}
+

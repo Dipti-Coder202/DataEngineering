@@ -1,0 +1,31 @@
+resources:
+  jobs:
+    retail_sales_workflow:
+      name: "[${bundle.target}] Project 9 Retail Lakehouse Workflow"
+      max_concurrent_runs: 1
+      tasks:
+        - task_key: refresh_medallion_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.retail_sales_pipeline.id}
+            full_refresh: false
+
+        - task_key: build_and_test_dbt_marts
+          depends_on:
+            - task_key: refresh_medallion_pipeline
+          dbt_task:
+            project_directory: ../dbt
+            commands:
+              - dbt deps
+              - dbt build --target job
+            warehouse_id: ${var.sql_warehouse_id}
+            catalog: ${var.catalog}
+            schema: ${var.schema}
+          environment_key: dbt_environment
+
+      environments:
+        - environment_key: dbt_environment
+          spec:
+            client: "2"
+            dependencies:
+              - dbt-databricks>=1.9.0,<2.0.0
+

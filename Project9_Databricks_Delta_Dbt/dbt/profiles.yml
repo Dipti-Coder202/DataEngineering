@@ -1,0 +1,13 @@
+project9_retail_analytics:
+  target: job
+  outputs:
+    job:
+      type: databricks
+      method: http
+      catalog: "{{ env_var('DBT_CATALOG', 'workspace') }}"
+      schema: "{{ env_var('DBT_SCHEMA', 'project9_retail_dev') }}"
+      host: "{{ env_var('DATABRICKS_HOST') }}"
+      http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
+      token: "{{ env_var('DATABRICKS_TOKEN') }}"
+      threads: 4
+

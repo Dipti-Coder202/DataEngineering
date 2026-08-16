@@ -1,0 +1,28 @@
+name: project9_retail_analytics
+version: 1.0.0
+config-version: 2
+
+profile: project9_retail_analytics
+
+model-paths: ["models"]
+snapshot-paths: ["snapshots"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  project9_retail_analytics:
+    staging:
+      +materialized: view
+      +tags: [staging]
+    dimensions:
+      +materialized: table
+      +tags: [dimension]
+    marts:
+      +materialized: table
+      +tags: [mart]
+
+seeds:
+  project9_retail_analytics:
+    +schema: reference
+

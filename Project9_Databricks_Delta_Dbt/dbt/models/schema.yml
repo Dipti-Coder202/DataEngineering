@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: stg_current_orders
+    description: One current, validated record per order.
+    columns:
+      - name: order_id
+        data_tests: [not_null, unique]
+      - name: customer_id
+        data_tests: [not_null]
+      - name: product_id
+        data_tests: [not_null]
+      - name: total_amount
+        data_tests:
+          - not_null
+
+  - name: dim_customer
+    columns:
+      - name: customer_id
+        data_tests: [not_null, unique]
+
+  - name: dim_product
+    columns:
+      - name: product_id
+        data_tests: [not_null, unique]
+
+  - name: fct_sales
+    columns:
+      - name: order_id
+        data_tests: [not_null, unique]
+      - name: customer_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_customer')
+                field: customer_id
+      - name: product_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_product')
+                field: product_id
+
+  - name: mart_daily_sales
+    columns:
+      - name: order_date
+        data_tests: [not_null]
+      - name: gross_sales
+        data_tests: [not_null]
+

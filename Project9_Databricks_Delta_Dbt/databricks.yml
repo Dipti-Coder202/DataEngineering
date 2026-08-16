@@ -1,0 +1,38 @@
+bundle:
+  name: project9-retail-lakehouse
+
+include:
+  - resources/*.yml
+
+sync:
+  include:
+    - src/**
+    - dbt/**
+
+variables:
+  catalog:
+    description: Unity Catalog catalog used by the project
+    default: workspace
+  schema:
+    description: Isolated schema used by the pipeline and dbt
+    default: project9_retail
+  source_path:
+    description: Unity Catalog Volume path containing landing JSON files
+    default: /Volumes/workspace/project9_retail/landing/retail_orders
+  sql_warehouse_id:
+    description: Serverless SQL warehouse ID used by the dbt task
+    default: REPLACE_WITH_WAREHOUSE_ID
+
+targets:
+  dev:
+    default: true
+    mode: development
+    variables:
+      schema: project9_retail_dev
+      source_path: /Volumes/workspace/project9_retail_dev/landing/retail_orders
+  prod:
+    mode: production
+    variables:
+      schema: project9_retail
+      source_path: /Volumes/workspace/project9_retail/landing/retail_orders
+
