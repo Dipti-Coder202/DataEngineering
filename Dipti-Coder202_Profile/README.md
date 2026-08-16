@@ -1,4 +1,4 @@
-# Hi, I'm Akash Giri 👋
+# Hi, I'm Dipti Sahu 👋
 
 ### Data Engineer | 3 Years of Experience | Batch & Streaming Pipelines
 
