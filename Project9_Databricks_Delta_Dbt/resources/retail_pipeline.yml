@@ -11,5 +11,5 @@ resources:
         - file:
             path: ../src/pipelines/retail_pipeline.py
       configuration:
+        project9.bundle_root: ${workspace.file_path}
         project9.source_path: ${var.source_path}
-

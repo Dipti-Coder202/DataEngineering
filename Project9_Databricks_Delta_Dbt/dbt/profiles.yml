@@ -1,7 +1,7 @@
 project9_retail_analytics:
-  target: job
+  target: databricks_cluster
   outputs:
-    job:
+    databricks_cluster:
       type: databricks
       method: http
       catalog: "{{ env_var('DBT_CATALOG', 'workspace') }}"
@@ -10,4 +10,3 @@ project9_retail_analytics:
       http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
       token: "{{ env_var('DATABRICKS_TOKEN') }}"
       threads: 4
-

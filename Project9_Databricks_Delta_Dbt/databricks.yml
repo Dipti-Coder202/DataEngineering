@@ -8,6 +8,7 @@ sync:
   include:
     - src/**
     - dbt/**
+    - data/**
 
 variables:
   catalog:
@@ -35,4 +36,3 @@ targets:
     variables:
       schema: project9_retail
       source_path: /Volumes/workspace/project9_retail/landing/retail_orders
-

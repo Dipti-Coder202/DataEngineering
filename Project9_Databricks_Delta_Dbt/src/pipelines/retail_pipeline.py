@@ -1,8 +1,14 @@
 """Lakeflow Declarative Pipeline implementing Bronze, Silver, and Gold."""
 
+import sys
+
 from pyspark import pipelines as dp
 from pyspark.sql import functions as F
 from pyspark.sql import types as T
+
+# Lakeflow executes source files as notebooks, where ``__file__`` is undefined.
+# The bundle injects its uploaded root explicitly so shared modules are importable.
+sys.path.insert(0, spark.conf.get("project9.bundle_root"))
 
 from src.transformations import daily_sales, quarantined_orders, valid_orders
 
@@ -71,4 +77,3 @@ dp.create_auto_cdc_flow(
 def gold_daily_sales():
     current_orders = spark.read.table("silver_orders_history").filter(F.col("__END_AT").isNull())
     return daily_sales(current_orders)
-

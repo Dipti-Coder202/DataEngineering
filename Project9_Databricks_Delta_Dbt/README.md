@@ -71,7 +71,16 @@ These tests validate transformation and quality logic without requiring a paid c
    export DATABRICKS_CONFIG_PROFILE=project9
    ```
 
-3. In the workspace, import and run `src/setup_sample_data.py` once. Keep its defaults for the `dev` target. It creates the schema, `landing` volume, and sample CDC records.
+3. Create the development schema and landing Volume, then upload the included sample data:
+
+   ```bash
+   databricks schemas create project9_retail_dev workspace --profile project9
+   databricks volumes create workspace project9_retail_dev landing MANAGED --profile project9
+   databricks fs mkdir dbfs:/Volumes/workspace/project9_retail_dev/landing/retail_orders --profile project9
+   databricks fs cp data/sample_orders.json dbfs:/Volumes/workspace/project9_retail_dev/landing/retail_orders/sample_orders.json --profile project9 --overwrite
+   ```
+
+   Alternatively, import and run `src/setup_sample_data.py` once in the workspace.
 4. Open **SQL Warehouses**, select a serverless warehouse, and copy its ID from the URL or connection details.
 
 Free Edition has quotas and serverless-only constraints, so this project intentionally does not define a classic cluster.
@@ -109,7 +118,9 @@ Expected results:
 - Gold and dbt marts contain only current, valid orders.
 - The workflow and all dbt tests finish successfully.
 
+The Databricks job runtime creates a dbt profile target named
+`databricks_cluster`; the bundle uses that generated target intentionally.
+
 ## Production improvements
 
 For a real production workload, add separate catalogs per environment, service-principal authentication, external locations, row/column permissions, monitoring alerts, cost policies, CI deployment approvals, and event-driven file arrival. The Free Edition configuration here stays intentionally small and reproducible.
-

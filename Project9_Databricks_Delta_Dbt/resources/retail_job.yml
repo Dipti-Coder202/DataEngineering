@@ -16,7 +16,7 @@ resources:
             project_directory: ../dbt
             commands:
               - dbt deps
-              - dbt build --target job
+              - dbt build --target databricks_cluster
             warehouse_id: ${var.sql_warehouse_id}
             catalog: ${var.catalog}
             schema: ${var.schema}
@@ -28,4 +28,3 @@ resources:
             client: "2"
             dependencies:
               - dbt-databricks>=1.9.0,<2.0.0
-
