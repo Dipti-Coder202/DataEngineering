@@ -1,0 +1,49 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+.venv/
+
+# Runtime data lake content (keep directory placeholders)
+data/bronze/*
+!data/bronze/.gitkeep
+data/silver/*
+!data/silver/.gitkeep
+data/gold/*
+!data/gold/.gitkeep
+data/quarantine/*
+!data/quarantine/.gitkeep
+data/state/*
+!data/state/.gitkeep
+
+# Runtime logs
+logs/*
+!logs/.gitkeep
+*.log
+
+# JDBC binaries
+jars/*
+!jars/.gitkeep
+
+# Local Airflow metadata
+airflow/
+
+# Spark runtime files
+metastore_db/
+spark-warehouse/
+derby.log
+*.crc
+_SUCCESS
+
+# Editors and OS files
+.vscode/
+.idea/
+.DS_Store
