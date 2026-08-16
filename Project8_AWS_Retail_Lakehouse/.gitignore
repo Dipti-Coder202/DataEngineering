@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+logs/*
+!logs/.gitkeep
+airflow/
+.terraform/
+*.tfstate*
+.terraform.lock.hcl

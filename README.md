@@ -31,6 +31,7 @@ business examples.
 
 | Project | Engineering focus | Main technologies |
 |---|---|---|
+| [Project 8: Local AWS Lakehouse](Project8_AWS_Retail_Lakehouse/) | S3-compatible object storage, Iceberg ACID tables, incremental JDBC, infrastructure as code | PySpark, Iceberg, MinIO, PostgreSQL, Airflow, Terraform |
 | [Project 7: PySpark Medallion Pipeline](Project7_RetailSales_PySpark/) | Incremental JDBC extraction, Bronze/Silver/Gold Parquet, compound watermark, quarantine, reconciliation, AQE, tests | PySpark, Airflow, PostgreSQL, Parquet, pytest |
 | [Project 6: Airflow ETL](Project6_RetailSales_Airflow/) | DAG orchestration, retries, task logs, incremental/upsert-style processing | Airflow, Python, PostgreSQL |
 | [Project 5: Kafka Streaming](Project5_RetailSales_KafkaStreaming/) | Event production, Structured Streaming, checkpointing, micro-batches, database upserts | Kafka, PySpark, Docker, PostgreSQL |
